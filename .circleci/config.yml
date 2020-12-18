@@ -4,15 +4,15 @@ workflows:
   build-deploy:
     jobs:
       - build:
-          context: mule
+          context: test-circle-ci
 jobs:
   build:
     docker:
       - image: 'circleci/openjdk:8-jdk'
         environment:
           MULE_VERSION: 4.3.0
-          MULE_APP_NAME: mulesoft-gitlab-cd
-          MULE_ENV: DEV
+          MULE_APP_NAME: mulesoft-circle-ci-cd
+          MULE_ENV: SANDBOX
           MULE_WORKER_TYP: MICRO
           MULE_WORKER: 1
     steps:
@@ -26,15 +26,7 @@ jobs:
       - run:
           name: Build
           command: |
-            mvn clean compile -s settings.xml
-      - run:
-          name: mUnit Test
-          command: |
-            mvn clean test -s settings.xml
-      - run:
-          name: artifactory deployment
-          command: |
-            mvn clean deploy -s settings.xml
+            mvn clean compile
       - run:
           name: cloudhub deployment
           command: |
