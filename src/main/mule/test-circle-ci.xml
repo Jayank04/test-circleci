@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5ddd3566-7b58-401f-9acf-463f9a9d45dd" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="07a9ed8a-2416-48d0-9aae-2e80191ff6de" environment="sandbox" />
 	<flow name="test-circle-ciFlow" doc:id="15bf56e1-cae2-4b70-9e7e-e2c1e8ce2969" >
 		<http:listener doc:name="Listener" doc:id="03125736-8fa2-4a64-bb1a-96e533efd61e" config-ref="HTTP_Listener_config" path="test"/>
+		<json-logger:logger doc:name="Logger" doc:id="9bafbb15-2105-45d3-bfdc-98175355e1db" config-ref="JSON_Logger_Config" message="#[payload]"/>
 		<ee:transform doc:name="Transform Message" doc:id="8bfa73d0-b7d2-48b0-9397-006acf47db4b" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	message : "success"
+	message : "success",
+	originalPayload: payload
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<json-logger:logger doc:name="Logger" doc:id="0caca7e2-513a-4383-b697-5697d1192f31" message="#[payload]" config-ref="JSON_Logger_Config" tracePoint="END"/>
 	</flow>
 </mule>
